@@ -1,4 +1,4 @@
-<h4 align="center"> 
+﻿<h4 align="center"> 
 	♻️ The frontend of a platform that provides waste disposal in an ecological way.
 </h4>
 
