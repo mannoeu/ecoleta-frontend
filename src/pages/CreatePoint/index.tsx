@@ -1,13 +1,17 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+﻿/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { Link, useHistory } from "react-router-dom";
 import { FiArrowLeft, FiCheckCircle } from "react-icons/fi";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
+import { Toast } from "../../utils/swal";
 
+import formatWhatsapp from "../../utils/mask";
 import api from "../../services/api";
 import logo from "../../assets/logo.svg";
+
+import Dropzone from "../../components/Dropzone";
 
 import "./styles.css";
 
@@ -46,14 +50,14 @@ const CreatePoint: React.FC = () => {
     0,
   ]);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    whatsapp: "",
-  });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
 
   const [selectedItems, setSelectedItems] = useState<number[]>([0, 0]);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File>();
+  const [loading, setLoading] = useState(false);
 
   async function getItems() {
     const res = await api.get("/items");
@@ -116,11 +120,6 @@ const CreatePoint: React.FC = () => {
     getCurrentPosition();
   }, []);
 
-  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  }
-
   function handleSelectItem(id: number) {
     const alreadySelected = selectedItems.findIndex((item) => item === id);
 
@@ -134,23 +133,39 @@ const CreatePoint: React.FC = () => {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setLoading(true);
 
-    const { name, email, whatsapp } = formData;
+    if (!selectedFile) {
+      Toast.fire({
+        icon: "error",
+        title: "Você precisa carregar uma imagem",
+      });
+
+      setLoading(false);
+      return;
+    }
+
     const uf = selectedUf;
     const city = selectedCity;
     const [latitude, longitude] = selectedPosition;
     const items = selectedItems;
 
-    const data = {
-      name,
-      email,
-      whatsapp,
-      uf,
-      city,
-      latitude,
-      longitude,
-      items,
-    };
+    // classe global do js no formato para aceitar arquivos etc
+    const data = new FormData();
+
+    data.append("name", name);
+    data.append("email", email);
+    data.append("whatsapp", whatsapp);
+    data.append("uf", uf);
+    data.append("city", city);
+    data.append("latitude", String(latitude));
+    data.append("longitude", String(longitude));
+    data.append("items", items.join(","));
+
+    if (selectedFile) {
+      data.append("image", selectedFile);
+    }
+
     try {
       await api.post("/points", data);
       setIsSuccess(true);
@@ -159,8 +174,15 @@ const CreatePoint: React.FC = () => {
         history.push("/");
       }, 2000);
     } catch (err) {
-      console.log(err);
+      Toast.fire({
+        icon: "error",
+        title:
+          "Ops, algo deu errado! Verifique todos os campos e tente novamente",
+      });
+      console.log(err.message);
+      setLoading(false);
     }
+    setLoading(false);
   }
 
   return (
@@ -177,6 +199,7 @@ const CreatePoint: React.FC = () => {
         <h1>
           Cadastro do <br /> ponto de coleta
         </h1>
+        <Dropzone onFileUploaded={setSelectedFile} />
         <fieldset>
           <legend>
             <h2>Dados</h2>
@@ -188,7 +211,8 @@ const CreatePoint: React.FC = () => {
               name="name"
               id="name"
               required
-              onChange={handleInputChange}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div className="field-group">
@@ -200,7 +224,8 @@ const CreatePoint: React.FC = () => {
                 name="email"
                 id="email"
                 required
-                onChange={handleInputChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="field">
@@ -209,9 +234,12 @@ const CreatePoint: React.FC = () => {
                 inputMode="numeric"
                 type="text"
                 name="whatsapp"
+                maxLength={15}
+                minLength={15}
                 id="whatsapp"
                 required
-                onChange={handleInputChange}
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(formatWhatsapp(e.target.value))}
               />
             </div>
           </div>
@@ -291,7 +319,9 @@ const CreatePoint: React.FC = () => {
             ))}
           </ul>
         </fieldset>
-        <button type="submit">Cadastrar ponto de coleta</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Aguarde..." : "Cadastrar ponto de coleta"}
+        </button>
       </form>
       <div id="modal-success" className={isSuccess ? "success" : ""}>
         <FiCheckCircle size={26} color="#34cb79" />

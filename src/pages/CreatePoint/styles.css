@@ -1,13 +1,17 @@
 #page-create-point {
-  width: 100%;
-  max-width: 1100px;
-
+  max-width: 90%;
+  width: 1100px;
   margin: 0 auto;
+}
+
+@media (max-width: 991px) {
+  #page-create-point {
+    padding: 0 10px;
+  }
 }
 
 #page-create-point header {
   margin-top: 48px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -27,6 +31,18 @@
   color: var(--primary-color);
 }
 
+@media (max-width: 991px) {
+  #page-create-point header a {
+    font-size: 14px;
+  }
+  #page-create-point header a svg {
+    margin-right: 5px;
+  }
+  #page-create-point header img {
+    width: 120px;
+  }
+}
+
 #page-create-point form {
   margin: 80px auto;
   padding: 64px;
@@ -36,6 +52,12 @@
 
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 991px) {
+  #page-create-point form {
+    padding: 32px;
+  }
 }
 
 #page-create-point form h1 {
@@ -56,6 +78,12 @@
   margin-bottom: 40px;
 }
 
+@media (max-width: 991px) {
+  #page-create-point form fieldset {
+    margin-top: 32px;
+  }
+}
+
 #page-create-point form legend h2 {
   font-size: 24px;
 }
@@ -66,9 +94,22 @@
   color: var(--text-color);
 }
 
+@media (max-width: 991px) {
+  #page-create-point form legend span {
+    text-align: right;
+    margin-left: 10px;
+  }
+}
+
 #page-create-point form .field-group {
   flex: 1;
   display: flex;
+}
+
+@media (max-width: 991px) {
+  #page-create-point form .field-group {
+    flex-direction: column;
+  }
 }
 
 #page-create-point form .field {
@@ -113,6 +154,12 @@
   margin-bottom: 8px;
 }
 
+@media (max-width: 991px) {
+  #page-create-point form .field label {
+    margin-bottom: 8px;
+  }
+}
+
 #page-create-point form .field :disabled {
   cursor: not-allowed;
 }
@@ -123,6 +170,15 @@
 
 #page-create-point form .field-group input + input {
   margin-left: 24px;
+}
+
+@media (max-width: 991px) {
+  #page-create-point form .field-group .field + .field {
+    margin-left: 0;
+  }
+  #page-create-point form .field-group input + input {
+    margin-left: 0;
+  }
 }
 
 #page-create-point form .field-check {
@@ -160,13 +216,20 @@
   cursor: pointer;
 }
 
+#page-create-point form button:disabled {
+  background: #2fb86f72;
+}
+#page-create-point form button:disabled:hover {
+  background: #2fb86fa5;
+}
+
 #page-create-point form button:hover {
   background: #2fb86e;
 }
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
   list-style: none;
 }
@@ -177,21 +240,17 @@
   height: 180px;
   border-radius: 8px;
   padding: 32px 24px 16px;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-
   text-align: center;
-
   cursor: pointer;
 }
 
 .items-grid li span {
   flex: 1;
   margin-top: 12px;
-
   display: flex;
   align-items: center;
   color: var(--title-color);
@@ -200,6 +259,18 @@
 .items-grid li.selected {
   background: #e1faec;
   border: 2px solid #34cb79;
+}
+
+@media (max-width: 991px) {
+  .items-grid li {
+    padding: 20px;
+  }
+
+  #page-create-point form button {
+    width: 232px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 #modal-success {
